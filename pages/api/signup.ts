@@ -2,22 +2,22 @@ import bcrypt from 'bcrypt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createUser, getUserByUsername, User } from '../../util/database';
 
-type RegisterRequestBody = {
+type SignupRequestBody = {
   username: string;
   password: string;
 };
 
 type RegisterNextApiRequest = Omit<NextApiRequest, 'body'> & {
-  body: RegisterRequestBody;
+  body: SignupRequestBody;
 };
 
-export type RegisterResponseBody =
+export type SignupResponseBody =
   | { errors: { message: string }[] }
   | { user: User };
 
 export default async function registerHandler(
   request: RegisterNextApiRequest,
-  response: NextApiResponse<RegisterResponseBody>,
+  response: NextApiResponse<SignupResponseBody>,
 ) {
   if (request.method === 'POST') {
     if (
