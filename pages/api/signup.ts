@@ -7,7 +7,7 @@ type SignupRequestBody = {
   password: string;
 };
 
-type RegisterNextApiRequest = Omit<NextApiRequest, 'body'> & {
+type SignupNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: SignupRequestBody;
 };
 
@@ -15,8 +15,8 @@ export type SignupResponseBody =
   | { errors: { message: string }[] }
   | { user: User };
 
-export default async function registerHandler(
-  request: RegisterNextApiRequest,
+export default async function signupHandler(
+  request: SignupNextApiRequest,
   response: NextApiResponse<SignupResponseBody>,
 ) {
   if (request.method === 'POST') {
