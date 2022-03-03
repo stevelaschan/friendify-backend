@@ -13,9 +13,9 @@ type LoginNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: LoginRequestBody;
 };
 
-export type LoginResponseBody =
-  | { errors: { message: string }[] }
-  | { user: Pick<User, 'id'> };
+// export type LoginResponseBody =
+//   | { errors: { message: string }[] }
+//   | { user: Pick<User, 'id'> };
 
 export default async function loginHandler(
   request: LoginNextApiRequest,
@@ -68,14 +68,6 @@ export default async function loginHandler(
       });
       return; // Important: will prevent "Headers already sent" error
     }
-
-    response.status(201).json({
-      user: {
-        id: userWithPasswordHash.id,
-      },
-    });
-    return;
-  }
 
       // 1. Create a unique token
       const token = crypto.randomBytes(64).toString('base64');
