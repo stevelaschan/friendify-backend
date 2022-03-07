@@ -6,7 +6,7 @@ type LogoutNextApiRequest = Omit<NextApiRequest, 'body'> & {
 };
 
 
-export default async function userSignedInHandler(request: LogoutNextApiRequest, response: NextApiResponse<LogoutResponseBody>) {
+export default async function userSignedInHandler(request: userSignedInNextApiRequest, response: NextApiResponse<userSignedInResponseBody>) {
   if (request.method === 'GET') {
 
     const token = request.cookies.sessionToken;

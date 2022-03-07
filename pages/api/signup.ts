@@ -53,7 +53,7 @@ export default async function signupHandler(
     }
 
     const passwordHash = await bcrypt.hash(request.body.password, 12);
-    const user = await createUser(request.body.username, passwordHash);
+    const user = await createUser(request.body.firstName, request.body.lastName, request.body.age, request.body.username, passwordHash);
 
     // 1. Create a unique token
     const token = crypto.randomBytes(64).toString('base64');

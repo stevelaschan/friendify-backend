@@ -66,7 +66,10 @@ export async function getUserByValidSessionToken(token: string | undefined) {
   const [user] = await sql<[User | undefined]>`
     SELECT
       users.id,
-      users.username
+      users.username,
+      users.first_name,
+      users.last_name,
+      users.age
     FROM
       users,
       sessions
@@ -85,6 +88,16 @@ export async function getUserByUsername(username: string) {
   return user && camelcaseKeys(user);
 }
 
+export async function getAllUsers() {
+  const [users] = await sql<[{ id: number } | undefined]>`
+    SELECT
+    users.username,
+    FROM
+    users
+  `;
+  return users.map((user) => camelcaseKeys(user));
+}
+
 export async function getUserWithPasswordHashByUsername(username: string) {
   const [user] = await sql<[UserWithPasswordHash | undefined]>`
     SELECT
@@ -100,14 +113,17 @@ export async function getUserWithPasswordHashByUsername(username: string) {
 }
 
 // CREATE USER
-export async function createUser(username: string, passwordHash: string) {
+export async function createUser(firstName: string, lastName: string, age: string, username: string, passwordHash: string) {
   const [user] = await sql<[User]>`
     INSERT INTO users
-      (username, password_hash)
+      (first_name, last_name, age, username, password_hash)
     VALUES
-      (${username}, ${passwordHash})
+      (${firstName}, ${lastName}, ${age}, ${username}, ${passwordHash})
     RETURNING
       id,
+      first_name,
+      last_name,
+      age,
       username
   `;
   return camelcaseKeys(user);
