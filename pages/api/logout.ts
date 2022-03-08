@@ -27,8 +27,8 @@ export default async function LogoutHandler(request: LogoutNextApiRequest, respo
       serialize('sessionToken', '', {
         maxAge: -1,
         path: '/',
-      }),
-    );
+      })
+    ).send()
   }
   return
 }
