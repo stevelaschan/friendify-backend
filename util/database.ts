@@ -83,15 +83,24 @@ export async function getUserByValidSessionToken(token: string | undefined) {
 
 export async function getUserByUsername(username: string) {
   const [user] = await sql<[{ id: number } | undefined]>`
-    SELECT id FROM users WHERE username = ${username}
+    SELECT
+    first_name,
+    last_name,
+    age,
+    username
+    FROM
+    users
+    WHERE username = ${username}
   `;
   return user && camelcaseKeys(user);
 }
 
 export async function getAllUsers() {
-  const [users] = await sql<[{ id: number } | undefined]>`
+  const users = await sql<User[]>`
     SELECT
-    users.username,
+    id,
+    username,
+    age
     FROM
     users
   `;

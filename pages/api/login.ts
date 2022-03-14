@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createSession, getUserWithPasswordHashByUsername, User, getUserByValidSessionToken } from '../../util/database';
+import { createSession, getUserWithPasswordHashByUsername, User, getUserByValidSessionToken, getUserByUsername } from '../../util/database';
 import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 
 type LoginRequestBody = {
@@ -82,13 +82,20 @@ export default async function loginHandler(
         session.token,
       );
 
-      // 4. Add the cookie to the header response
+      // 4. get User by username
+      const user = await getUserByUsername(request.body.username)
+
+      // 5. Add the cookie to the header response
       response
         .status(201)
         .setHeader('Set-Cookie', serializedCookie)
         .json({
           user: {
             id: userWithPasswordHash.id,
+            firstName: user.firstName,
+            lastName : user.lastName,
+            age: user.age,
+            username: user.username,
           },
         });
       return;

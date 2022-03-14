@@ -9,13 +9,11 @@ export default async function protectedUserHandler(request: protectsUserNextApiR
     // get valid session token
     const session = await getValidSessionByToken (token)
     // console.log("user", user)
-    // console.log("session", session)
 
     if (!user) {
       response.status(404).json({
         error: "User or Session not found"
-      }
-      )
+      })
       return
     }
 
