@@ -1,30 +1,56 @@
-import { getUserByValidSessionToken, getValidSessionByToken } from '../../util/database';
 import { NextApiRequest, NextApiResponse } from 'next';
+import {
+  getRatingByUserId,
+  getUserByValidSessionToken,
+  User,
+} from '../../util/database';
 
-export default async function protectedUserHandler(request: protectsUserNextApiRequest, response: NextApiResponse<protectedUserResponseBody>) {
-  if(request.method === "GET") {
+type ProtectedUserRequestBody = {
+  firstName: string;
+  lastName: string;
+  age: string;
+  shortDescription: string;
+  isProvider: boolean;
+};
+
+type ProtectedUserNextApiRequest = Omit<NextApiRequest, 'body'> & {
+  body: ProtectedUserRequestBody;
+};
+
+type ProtectedUserResponseBody =
+  | { error: string }
+  | { user: User; provider: number };
+
+export default async function protectedUserHandler(
+  request: ProtectedUserNextApiRequest,
+  response: NextApiResponse<ProtectedUserResponseBody>,
+) {
+  if (request.method === 'GET') {
     const token = request.cookies.sessionToken;
     // get user from session token
     const user = await getUserByValidSessionToken(token);
-    // get valid session token
-    const session = await getValidSessionByToken (token)
-    // console.log("user", user)
-
+    const rating = await getRatingByUserId(user.id);
+    // console.log(rating);
     if (!user) {
       response.status(404).json({
-        error: "User or Session not found"
-      })
-      return
+        error: 'User or Session not found',
+      });
+      return;
     }
+    // console.log(user);
 
-    response.json({user: {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      age: user.age,
-      username: user.username
+    response.json({
+      user: {
+        id: user.id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        age: user.age,
+        shortDescription: user.shortDescription,
+        isProvider: user.isProvider,
       },
-      session: session
-    })
-    return
+      provider: rating,
+    });
+    return;
   }
 }

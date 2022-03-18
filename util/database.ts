@@ -41,18 +41,57 @@ const sql = connectOneTimeToDatabase();
 export type User = {
   id: number;
   username: string;
+  firstName: string;
+  lastName: string;
+  age: string;
+  shortDescription: string;
+  isProvider: boolean;
 };
 
 export type UserWithPasswordHash = User & {
   passwordHash: string;
 };
 
-// GET USER
+// USER
+
+// CREATE
+export async function createUser(
+  firstName: string,
+  lastName: string,
+  age: string,
+  username: string,
+  passwordHash: string,
+  shortDescription: string,
+  isProvider: boolean,
+) {
+  const [user] = await sql<[User]>`
+    INSERT INTO users
+      (first_name, last_name, age, username, password_hash, short_description, is_provider)
+    VALUES
+      (${firstName}, ${lastName}, ${age}, ${username}, ${passwordHash}, ${shortDescription}, ${isProvider})
+    RETURNING
+      id,
+      first_name,
+      last_name,
+      age,
+      username
+      short_description,
+      is_provider
+  `;
+  return camelcaseKeys(user);
+}
+
+// READ
+// by id
 export async function getUserById(id: number) {
   const [user] = await sql<[User | undefined]>`
     SELECT
-      id,
-      username
+      first_name,
+      last_name,
+      age,
+      username,
+      short_description,
+      is_provider
     FROM
       users
     WHERE
@@ -61,6 +100,7 @@ export async function getUserById(id: number) {
   return user && camelcaseKeys(user);
 }
 
+// by valid session token
 export async function getUserByValidSessionToken(token: string | undefined) {
   if (!token) return undefined;
   const [user] = await sql<[User | undefined]>`
@@ -69,7 +109,9 @@ export async function getUserByValidSessionToken(token: string | undefined) {
       users.username,
       users.first_name,
       users.last_name,
-      users.age
+      users.age,
+      users.short_description,
+      users.is_provider
     FROM
       users,
       sessions
@@ -81,13 +123,17 @@ export async function getUserByValidSessionToken(token: string | undefined) {
   return user && camelcaseKeys(user);
 }
 
+// by username
 export async function getUserByUsername(username: string) {
   const [user] = await sql<[{ id: number } | undefined]>`
     SELECT
+    id,
     first_name,
     last_name,
     age,
-    username
+    username,
+    short_description,
+    is_provider
     FROM
     users
     WHERE username = ${username}
@@ -95,18 +141,22 @@ export async function getUserByUsername(username: string) {
   return user && camelcaseKeys(user);
 }
 
+// all users
 export async function getAllUsers() {
-  const users = await sql<User[]>`
+  const users = await sql<[User | undefined]>`
     SELECT
     id,
     username,
-    age
+    age,
+    short_description,
+    is_provider
     FROM
     users
   `;
-  return users.map((user) => camelcaseKeys(user));
+  return users.map((user: User) => camelcaseKeys(user));
 }
 
+// with passwordhash by username
 export async function getUserWithPasswordHashByUsername(username: string) {
   const [user] = await sql<[UserWithPasswordHash | undefined]>`
     SELECT
@@ -121,30 +171,146 @@ export async function getUserWithPasswordHashByUsername(username: string) {
   return user && camelcaseKeys(user);
 }
 
-// CREATE USER
-export async function createUser(firstName: string, lastName: string, age: string, username: string, passwordHash: string) {
-  const [user] = await sql<[User]>`
-    INSERT INTO users
-      (first_name, last_name, age, username, password_hash)
-    VALUES
-      (${firstName}, ${lastName}, ${age}, ${username}, ${passwordHash})
-    RETURNING
-      id,
-      first_name,
-      last_name,
-      age,
-      username
+// UPDATE
+// by username
+export async function updateUserByUsername(
+  username: string,
+  firstName: string,
+  lastName: string,
+  age: string,
+  shortDescription: string,
+  isProvider: boolean,
+) {
+  const [user] = await sql<[User | undefined]>`
+    UPDATE
+      users
+    SET
+      first_name = ${firstName},
+      last_name = ${lastName},
+      age = ${age},
+      short_description = ${shortDescription},
+      is_provider = ${isProvider}
+    WHERE
+      username = ${username}
+    RETURNING *
   `;
-  return camelcaseKeys(user);
+  return user && camelcaseKeys(user);
 }
 
-// GET SESSION TOKEN
+// PROVIDER
+
+type Provider = {
+  id: number;
+  userId: number;
+};
+
+// CREATE
+export async function createProvider(userId: number) {
+  const [provider] = await sql<[Provider]>`
+    INSERT INTO providers
+      (user_id)
+    VALUES
+      (${userId})
+    RETURNING
+      id,
+      user_id
+  `;
+  return camelcaseKeys(provider);
+}
+
+// READ
+// by id by user id
+export async function getProviderIdByUserId(id: number) {
+  const [provider] = await sql<[Provider | undefined]>`
+    SELECT
+      id
+    FROM
+      providers
+    WHERE
+      user_id = ${id}
+  `;
+  return provider && camelcaseKeys(provider);
+}
+
+// get ids by many user ids
+export async function getProviderIdsByUserIds(id: number) {
+  const provider = await sql<[Provider | undefined]>`
+    SELECT
+      id
+    FROM
+      providers
+    WHERE
+      user_id = ${id}
+  `;
+  return provider.map((object) => camelcaseKeys(object));
+}
+
+// RATING
+
+type Rating = {
+  id: number;
+  userId: number;
+  providerId: number;
+  rating: number;
+};
+
+// CREATE
+export async function createRating(
+  userId: number,
+  providerId: number,
+  rating: number,
+) {
+  const [stars] = await sql<[Rating | undefined]>`
+    INSERT INTO ratings
+      (user_id, provider_id, rating)
+    VALUES
+      (${userId}, ${providerId}, ${rating})
+    RETURNING
+      *
+  `;
+  return stars && camelcaseKeys(stars);
+}
+
+// READ
+export async function getRatingByProviderId(id: number) {
+  const stars = await sql<[Rating | undefined]>`
+    SELECT
+      *
+    FROM
+      ratings
+    WHERE
+      provider_id = ${id}
+  `;
+  return stars.map((star: Rating) => camelcaseKeys(star));
+}
+
+// SESSION TOKEN
+
 type Session = {
   id: number;
   token: string;
   userId: number;
 };
 
+// CREATE
+export async function createSession(token: string, userId: number) {
+  const [session] = await sql<[Session]>`
+  INSERT INTO sessions
+    (token, user_id)
+  VALUES
+    (${token}, ${userId})
+  RETURNING
+   id,
+   token
+`;
+
+  await deleteExpiredSessions();
+
+  return camelcaseKeys(session);
+}
+
+// READ
+// by valid session token
 export async function getValidSessionByToken(token: string | undefined) {
   if (!token) return undefined;
   const [session] = await sql<[Session | undefined]>`
@@ -162,24 +328,7 @@ export async function getValidSessionByToken(token: string | undefined) {
   return session && camelcaseKeys(session);
 }
 
-// CREATE SESSION TOKEN
-export async function createSession(token: string, userId: number) {
-  const [session] = await sql<[Session]>`
-  INSERT INTO sessions
-    (token, user_id)
-  VALUES
-    (${token}, ${userId})
-  RETURNING
-   id,
-   token
-`;
-
-  await deleteExpiredSessions();
-
-  return camelcaseKeys(session);
-}
-
-// DELETE SESSION TOKEN
+// DELETE
 export async function deleteSessionByToken(token: string) {
   const [session] = await sql<[Session | undefined]>`
   DELETE FROM
@@ -192,7 +341,7 @@ export async function deleteSessionByToken(token: string) {
 }
 
 export async function deleteExpiredSessions() {
-  const sessions = await sql<Session[]>`
+  const sessions = await sql<[Session | undefined]>`
     DELETE FROM
       sessions
     WHERE
@@ -200,5 +349,5 @@ export async function deleteExpiredSessions() {
     RETURNING *
   `;
 
-  return sessions.map((session) => camelcaseKeys(session));
+  return sessions.map((session: Session) => camelcaseKeys(session));
 }
