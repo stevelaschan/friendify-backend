@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  getRatingByUserId,
+  getProviderIdByUserId,
+  getRatingByProviderId,
   getUserByValidSessionToken,
   User,
 } from '../../util/database';
@@ -29,7 +30,8 @@ export default async function protectedUserHandler(
     const token = request.cookies.sessionToken;
     // get user from session token
     const user = await getUserByValidSessionToken(token);
-    const rating = await getRatingByUserId(user.id);
+    const providerId = await getProviderIdByUserId(user.id);
+    const rating = await getRatingByProviderId(providerId.id);
     // console.log(rating);
     if (!user) {
       response.status(404).json({

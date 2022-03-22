@@ -232,18 +232,18 @@ export async function getProviderIdByUserId(id: number) {
   return provider && camelcaseKeys(provider);
 }
 
-// get ids by many user ids
-export async function getProviderIdsByUserIds(id: number) {
-  const provider = await sql<[Provider | undefined]>`
-    SELECT
-      id
-    FROM
-      providers
-    WHERE
-      user_id = ${id}
-  `;
-  return provider.map((object) => camelcaseKeys(object));
-}
+// // get ids by many user ids
+// export async function getProviderIdsByUserIds(id: number) {
+//   const provider = await sql<[Provider | undefined]>`
+//     SELECT
+//       id
+//     FROM
+//       providers
+//     WHERE
+//       user_id = ${id}
+//   `;
+//   return provider.map((object) => camelcaseKeys(object));
+// }
 
 // RATING
 
@@ -281,7 +281,22 @@ export async function getRatingByProviderId(id: number) {
     WHERE
       provider_id = ${id}
   `;
-  return stars.map((star: Rating) => camelcaseKeys(star));
+  return stars && camelcaseKeys(stars);
+}
+
+export async function getRatingByUserId(id: number) {
+  const stars = await sql<[Rating | undefined]>`
+    SELECT
+      ratings.provider_id,
+      ratings.rating
+    FROM
+      ratings,
+      providers
+    WHERE
+      providers.user_id = ${id} AND
+      providers.id = ratings.provider_id
+  `;
+  return stars && camelcaseKeys(stars);
 }
 
 // SESSION TOKEN
@@ -350,4 +365,24 @@ export async function deleteExpiredSessions() {
   `;
 
   return sessions.map((session: Session) => camelcaseKeys(session));
+}
+
+// TIMESLOTS
+type Timeslot = {
+  providerId: number;
+  date: Date;
+  time: string;
+};
+
+// CREATE
+export async function createNewTimeslot(providerId, date, time) {
+  const timeslots = await sql<[Timeslot | undefined]>`
+  INSERT INTO timeslots
+    (provider_id, timeslot_date, timeslot_time)
+  VALUES
+    (${providerId}, ${date}, ${time})
+  RETURNING
+    *
+  `;
+  return timeslots.map((timeslot: Timeslot) => camelcaseKeys(timeslot));
 }

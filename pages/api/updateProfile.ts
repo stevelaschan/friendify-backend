@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { updateUserByUsername } from '../../util/database';
+import { createProvider, updateUserByUsername } from '../../util/database';
 import { SignupResponseBody } from './signup';
 
 type UpdateProfileRequestBody = {
@@ -28,6 +28,9 @@ export default async function updateUserHandler(
       userUpdateRequest.shortDescription,
       userUpdateRequest.isProvider,
     );
+
+    (await userUpdateRequest.isProvider) &&
+      createProvider(userUpdateRequest.id);
 
     // console.log(updateUser);
     response.json(updateUser);
