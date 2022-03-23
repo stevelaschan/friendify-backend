@@ -17,7 +17,6 @@ type SignupRequestBody = {
   username: string;
   password: string;
   shortDescription: string;
-  isUser: boolean;
   isProvider: boolean;
 };
 

@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getProviderIdByUserId, getUserById } from '../../util/database';
+import {
+  getProviderIdByUserId,
+  getTimeslotsByUserId,
+  getUserById,
+} from '../../util/database';
 
 type ProviderProfileRequestBody = {
   firstName: string;
@@ -9,17 +13,22 @@ type ProviderProfileRequestBody = {
 };
 
 type ProviderProfileResponseBody = {
-  profile: {
-    username: string;
-    firstName: string;
-    lastName: string;
-    age: string;
-    shortDescription: string;
-    isProvider: boolean;
-  };
-  id: {
-    id: number;
-  };
+  profile:
+    | {
+        username: string;
+        firstName: string;
+        lastName: string;
+        age: string;
+        shortDescription: string;
+        isProvider: boolean;
+      }
+    | undefined;
+  id:
+    | {
+        id: number;
+        userId: number;
+      }
+    | undefined;
 };
 
 type ProviderProfileNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -35,8 +44,13 @@ export default async function getRestrictedProfile(
 
     const providerProfile = await getUserById(userId);
     const providerId = await getProviderIdByUserId(userId);
-    const providerResponse = { profile: providerProfile, id: providerId };
-    response.json(providerResponse);
+    const providerTimeslots = await getTimeslotsByUserId(userId);
+    console.log(providerTimeslots);
+    response.json({
+      profile: providerProfile,
+      id: providerId,
+      timeslots: providerTimeslots,
+    });
     return;
   }
 }

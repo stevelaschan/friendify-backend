@@ -1,20 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  getAllUsers,
-  getProviderIdByUserId,
-  getRatingByProviderId,
-  getRatingByUserId,
-} from '../../util/database';
+import { getAllUsers, getRatingByUserId, User } from '../../util/database';
 
-type Provider = {
-  id: number;
-  username: string;
-  age: string;
-  shortDescription: string;
-  isProvider: boolean;
-};
+type getUsersNextApiRequest = Omit<NextApiRequest, 'body'>;
 
-export default async function getUsersHandler(request, response) {
+export default async function getUsersHandler(
+  request: getUsersNextApiRequest,
+  response: NextApiResponse<User[]>,
+) {
   if (request.method === 'GET') {
     const users = await getAllUsers();
     const provider = async () => {

@@ -38,6 +38,7 @@ function connectOneTimeToDatabase() {
 // Connect to PostgreSQL
 const sql = connectOneTimeToDatabase();
 
+// USER
 export type User = {
   id: number;
   username: string;
@@ -51,8 +52,6 @@ export type User = {
 export type UserWithPasswordHash = User & {
   passwordHash: string;
 };
-
-// USER
 
 // CREATE
 export async function createUser(
@@ -162,6 +161,11 @@ export async function getUserWithPasswordHashByUsername(username: string) {
     SELECT
       id,
       username,
+      first_name,
+      last_name,
+      age,
+      short_description,
+      is_provider,
       password_hash
     FROM
       users
@@ -199,7 +203,7 @@ export async function updateUserByUsername(
 
 // PROVIDER
 
-type Provider = {
+export type Provider = {
   id: number;
   userId: number;
 };
@@ -247,7 +251,7 @@ export async function getProviderIdByUserId(id: number) {
 
 // RATING
 
-type Rating = {
+export type Rating = {
   id: number;
   userId: number;
   providerId: number;
@@ -272,17 +276,17 @@ export async function createRating(
 }
 
 // READ
-export async function getRatingByProviderId(id: number) {
-  const stars = await sql<[Rating | undefined]>`
-    SELECT
-      *
-    FROM
-      ratings
-    WHERE
-      provider_id = ${id}
-  `;
-  return stars && camelcaseKeys(stars);
-}
+// export async function getRatingByProviderId(id: number) {
+//   const stars = await sql<[Rating | undefined]>`
+//     SELECT
+//       *
+//     FROM
+//       ratings
+//     WHERE
+//       provider_id = ${id}
+//   `;
+//   return stars;
+// }
 
 export async function getRatingByUserId(id: number) {
   const stars = await sql<[Rating | undefined]>`
@@ -296,12 +300,12 @@ export async function getRatingByUserId(id: number) {
       providers.user_id = ${id} AND
       providers.id = ratings.provider_id
   `;
-  return stars && camelcaseKeys(stars);
+  return stars.map((star) => camelcaseKeys(star.rating));
 }
 
 // SESSION TOKEN
 
-type Session = {
+export type Session = {
   id: number;
   token: string;
   userId: number;
@@ -368,15 +372,20 @@ export async function deleteExpiredSessions() {
 }
 
 // TIMESLOTS
-type Timeslot = {
+export type Timeslot = {
+  id: number;
   providerId: number;
-  date: Date;
-  time: string;
+  timeslotDate: Date;
+  timeslotTime: string;
 };
 
 // CREATE
-export async function createNewTimeslot(providerId, date, time) {
-  const timeslots = await sql<[Timeslot | undefined]>`
+export async function createNewTimeslot(
+  providerId: number,
+  date: Date,
+  time: string,
+) {
+  const [timeslot] = await sql<[Timeslot | undefined]>`
   INSERT INTO timeslots
     (provider_id, timeslot_date, timeslot_time)
   VALUES
@@ -384,5 +393,28 @@ export async function createNewTimeslot(providerId, date, time) {
   RETURNING
     *
   `;
-  return timeslots.map((timeslot: Timeslot) => camelcaseKeys(timeslot));
+  // return timeslots.map((timeslot: Timeslot) => camelcaseKeys(timeslot));
+  return timeslot && camelcaseKeys(timeslot);
+}
+
+// READ
+
+export async function getTimeslotsByUserId(id: number) {
+  const reservedTimeslots = await sql`
+    SELECT
+      timeslots.id,
+      timeslots.provider_id,
+      timeslots.timeslot_date,
+      timeslots.timeslot_time
+    FROM
+      timeslots,
+      providers
+    WHERE
+      providers.user_id = ${id} AND
+      providers.id = timeslots.provider_id
+  `;
+  // return reservedTimeslots.map((timeslot) =>
+  //   camelcaseKeys(timeslot.timeslot_time),
+  // );
+  return camelcaseKeys(reservedTimeslots);
 }

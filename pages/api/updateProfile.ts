@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createProvider, updateUserByUsername } from '../../util/database';
-import { SignupResponseBody } from './signup';
 
 type UpdateProfileRequestBody = {
   firstName: string;
@@ -9,13 +8,25 @@ type UpdateProfileRequestBody = {
   shortDescription: string;
 };
 
+type UpdateProfileResponseBody =
+  | {
+      id: number;
+      username: string;
+      firstName: string;
+      lastName: string;
+      age: string;
+      shortDescription: string;
+      isProvider: boolean;
+    }
+  | undefined;
+
 type UpdateProfileNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: UpdateProfileRequestBody;
 };
 
 export default async function updateUserHandler(
   request: UpdateProfileNextApiRequest,
-  response: NextApiResponse<SignupResponseBody>,
+  response: NextApiResponse<UpdateProfileResponseBody>,
 ) {
   if (request.method === 'PUT') {
     const userUpdateRequest = JSON.parse(request.body);

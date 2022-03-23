@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createRating } from '../../util/database';
-import { SignupResponseBody } from './signup';
 
 type CreateRating = {
+  id: number;
   userId: number;
   providerId: number;
   rating: number;
@@ -12,9 +12,11 @@ type CreateRatingNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: CreateRating;
 };
 
+type CreateRatingResponseBody = CreateRating | undefined;
+
 export default async function updateUserHandler(
   request: CreateRatingNextApiRequest,
-  response: NextApiResponse<SignupResponseBody>,
+  response: NextApiResponse<CreateRatingResponseBody>,
 ) {
   if (request.method === 'POST') {
     const userId = JSON.parse(request.body).userId;

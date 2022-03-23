@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
-  getProviderIdByUserId,
-  getRatingByProviderId,
+  getRatingByUserId,
+  getTimeslotsByUserId,
   getUserByValidSessionToken,
+  Rating,
   User,
 } from '../../util/database';
 
@@ -20,7 +21,8 @@ type ProtectedUserNextApiRequest = Omit<NextApiRequest, 'body'> & {
 
 type ProtectedUserResponseBody =
   | { error: string }
-  | { user: User; provider: number };
+  | { user: User; provider: Rating }
+  | undefined;
 
 export default async function protectedUserHandler(
   request: ProtectedUserNextApiRequest,
@@ -30,9 +32,12 @@ export default async function protectedUserHandler(
     const token = request.cookies.sessionToken;
     // get user from session token
     const user = await getUserByValidSessionToken(token);
-    const providerId = await getProviderIdByUserId(user.id);
-    const rating = await getRatingByProviderId(providerId.id);
-    // console.log(rating);
+    const ratings = await getRatingByUserId(user.id);
+    const addedRatings = ratings.reduce((a, c) => a + c, 0);
+    const averageRating = addedRatings / (ratings.length - 1);
+    const timeslots = await getTimeslotsByUserId(user.id);
+    console.log(timeslots);
+
     if (!user) {
       response.status(404).json({
         error: 'User or Session not found',
@@ -51,7 +56,8 @@ export default async function protectedUserHandler(
         shortDescription: user.shortDescription,
         isProvider: user.isProvider,
       },
-      provider: rating,
+      provider: averageRating,
+      timeslots: timeslots,
     });
     return;
   }

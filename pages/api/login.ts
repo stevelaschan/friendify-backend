@@ -4,10 +4,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 import {
   createSession,
-  getProviderIdByUserId,
-  getRatingByProviderId,
-  getUserByUsername,
+  getRatingByUserId,
+  getTimeslotsByUserId,
   getUserWithPasswordHashByUsername,
+  Rating,
   User,
 } from '../../util/database';
 
@@ -22,7 +22,7 @@ type LoginNextApiRequest = Omit<NextApiRequest, 'body'> & {
 
 export type LoginResponseBody =
   | { errors: { message: string }[] }
-  | { user: User; provider: number };
+  | { user: User; provider: Rating };
 
 export default async function loginHandler(
   request: LoginNextApiRequest,
@@ -82,19 +82,18 @@ export default async function loginHandler(
     // 2. Create the session
     const session = await createSession(token, userWithPasswordHash.id);
 
-    // console.log(session);
-
     // 3. Serialize the cookie
     const serializedCookie = await createSerializedRegisterSessionTokenCookie(
       session.token,
     );
 
-    // 4. get User by username
-    const user = await getUserByUsername(request.body.username);
-    const provider = await getProviderIdByUserId(user.id);
-    const ratings = await getRatingByProviderId(provider.id);
+    // 4. get ratings and timeslots by user id
+    const timeslots = await getTimeslotsByUserId(userWithPasswordHash.id);
+    const ratings = await getRatingByUserId(userWithPasswordHash.id);
+    // const addedRatings = ratings.reduce((a, c) => a + c, 0);
+    // const averageRating = addedRatings / (ratings.length - 1);
     // const rating = ratings.map((object) => object.rating);
-    // console.log(ratings);
+    console.log(ratings);
 
     // 5. Add the cookie to the header response
     response
@@ -103,14 +102,15 @@ export default async function loginHandler(
       .json({
         user: {
           id: userWithPasswordHash.id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          age: user.age,
-          username: user.username,
-          shortDescription: user.shortDescription,
-          isProvider: user.isProvider,
+          firstName: userWithPasswordHash.firstName,
+          lastName: userWithPasswordHash.lastName,
+          age: userWithPasswordHash.age,
+          username: userWithPasswordHash.username,
+          shortDescription: userWithPasswordHash.shortDescription,
+          isProvider: userWithPasswordHash.isProvider,
         },
         provider: ratings,
+        timeslots: timeslots,
       });
     return;
   }
