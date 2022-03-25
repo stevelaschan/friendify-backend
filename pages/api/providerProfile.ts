@@ -45,7 +45,7 @@ export default async function getRestrictedProfile(
     const providerProfile = await getUserById(userId);
     const providerId = await getProviderIdByUserId(userId);
     const providerTimeslots = await getTimeslotsByUserId(userId);
-    console.log(providerTimeslots);
+    // console.log('provider Id', providerId);
     response.json({
       profile: providerProfile,
       id: providerId,

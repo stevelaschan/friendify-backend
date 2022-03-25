@@ -90,10 +90,8 @@ export default async function loginHandler(
     // 4. get ratings and timeslots by user id
     const timeslots = await getTimeslotsByUserId(userWithPasswordHash.id);
     const ratings = await getRatingByUserId(userWithPasswordHash.id);
-    // const addedRatings = ratings.reduce((a, c) => a + c, 0);
-    // const averageRating = addedRatings / (ratings.length - 1);
-    // const rating = ratings.map((object) => object.rating);
-    console.log(ratings);
+    const averageRating = ratings.reduce((a, c) => a + c, 0) / ratings.length;
+    // console.log(averageRating);
 
     // 5. Add the cookie to the header response
     response
@@ -109,7 +107,7 @@ export default async function loginHandler(
           shortDescription: userWithPasswordHash.shortDescription,
           isProvider: userWithPasswordHash.isProvider,
         },
-        provider: ratings,
+        provider: averageRating,
         timeslots: timeslots,
       });
     return;

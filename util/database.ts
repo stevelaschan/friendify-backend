@@ -384,12 +384,13 @@ export async function createNewTimeslot(
   providerId: number,
   date: Date,
   time: string,
+  timeslotSet: boolean,
 ) {
   const [timeslot] = await sql<[Timeslot | undefined]>`
   INSERT INTO timeslots
-    (provider_id, timeslot_date, timeslot_time)
+    (provider_id, timeslot_date, timeslot_time, timeslotSet)
   VALUES
-    (${providerId}, ${date}, ${time})
+    (${providerId}, ${date}, ${time}, ${timeslotSet})
   RETURNING
     *
   `;
@@ -413,8 +414,46 @@ export async function getTimeslotsByUserId(id: number) {
       providers.user_id = ${id} AND
       providers.id = timeslots.provider_id
   `;
-  // return reservedTimeslots.map((timeslot) =>
-  //   camelcaseKeys(timeslot.timeslot_time),
-  // );
-  return camelcaseKeys(reservedTimeslots);
+  return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
+}
+
+// UPDATE
+
+export async function updateTimeslotWithUsername(
+  username: string,
+  providerId: number,
+  timeslotTime: string,
+  timeslotDate: Date,
+) {
+  const updatedTimeslots = await sql`
+    UPDATE
+      timeslots
+    SET
+      user_username = ${username}
+    WHERE
+      provider_id = ${providerId} AND
+      timeslot_time = ${timeslotTime} AND
+      timeslot_date = ${timeslotDate}
+  `;
+  return updatedTimeslots;
+}
+
+// DELETE
+
+export async function deleteTimeslot(
+  providerId: number,
+  timeslotDate: Date,
+  timeslotTime: string,
+) {
+  const deletedTimeslot = await sql`
+    DELETE FROM
+      timeslots
+    WHERE
+      provider_id = ${providerId} AND
+      timeslot_date = ${timeslotDate} AND
+      timeslot_time = ${timeslotTime}
+    RETURNING
+      *
+  `;
+  return deletedTimeslot.map((timeslot) => camelcaseKeys(timeslot));
 }

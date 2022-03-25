@@ -73,7 +73,8 @@ export default async function signupHandler(
       request.body.isProvider,
     );
 
-    (await user.isProvider) && createProvider(user.id);
+    // create provider id
+    await createProvider(user.id);
 
     // 1. Create a unique token
     const token = crypto.randomBytes(64).toString('base64');
