@@ -203,10 +203,12 @@ export async function updateUserByUsername(
 
 // PROVIDER
 
-export type Provider = {
-  id: number;
-  userId: number;
-};
+export type Provider =
+  | {
+      id: number;
+      userId: number;
+    }
+  | undefined;
 
 // CREATE
 export async function createProvider(userId: number) {
@@ -227,7 +229,7 @@ export async function createProvider(userId: number) {
 export async function getProviderIdByUserId(id: number) {
   const [provider] = await sql<[Provider | undefined]>`
     SELECT
-      id
+      *
     FROM
       providers
     WHERE
@@ -235,19 +237,6 @@ export async function getProviderIdByUserId(id: number) {
   `;
   return provider && camelcaseKeys(provider);
 }
-
-// // get ids by many user ids
-// export async function getProviderIdsByUserIds(id: number) {
-//   const provider = await sql<[Provider | undefined]>`
-//     SELECT
-//       id
-//     FROM
-//       providers
-//     WHERE
-//       user_id = ${id}
-//   `;
-//   return provider.map((object) => camelcaseKeys(object));
-// }
 
 // RATING
 
@@ -291,6 +280,8 @@ export async function createRating(
 export async function getRatingByUserId(id: number) {
   const stars = await sql<[Rating | undefined]>`
     SELECT
+      ratings.id,
+      ratings.user_id,
       ratings.provider_id,
       ratings.rating
     FROM
@@ -300,7 +291,8 @@ export async function getRatingByUserId(id: number) {
       providers.user_id = ${id} AND
       providers.id = ratings.provider_id
   `;
-  return stars.map((star) => camelcaseKeys(star.rating));
+  return camelcaseKeys(stars);
+  // return stars.map((star) => camelcaseKeys(star));
 }
 
 // SESSION TOKEN
@@ -384,13 +376,12 @@ export async function createNewTimeslot(
   providerId: number,
   date: Date,
   time: string,
-  timeslotSet: boolean,
 ) {
   const [timeslot] = await sql<[Timeslot | undefined]>`
   INSERT INTO timeslots
-    (provider_id, timeslot_date, timeslot_time, timeslotSet)
+    (provider_id, timeslot_date, timeslot_time)
   VALUES
-    (${providerId}, ${date}, ${time}, ${timeslotSet})
+    (${providerId}, ${date}, ${time} )
   RETURNING
     *
   `;
@@ -445,7 +436,7 @@ export async function deleteTimeslot(
   timeslotDate: Date,
   timeslotTime: string,
 ) {
-  const deletedTimeslot = await sql`
+  const [deletedTimeslot] = await sql`
     DELETE FROM
       timeslots
     WHERE
@@ -455,5 +446,5 @@ export async function deleteTimeslot(
     RETURNING
       *
   `;
-  return deletedTimeslot.map((timeslot) => camelcaseKeys(timeslot));
+  return camelcaseKeys(deletedTimeslot);
 }

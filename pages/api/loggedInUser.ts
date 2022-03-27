@@ -32,11 +32,6 @@ export default async function protectedUserHandler(
     const token = request.cookies.sessionToken;
     // get user from session token
     const user = await getUserByValidSessionToken(token);
-    const ratings = await getRatingByUserId(user.id);
-    const addedRatings = ratings.reduce((a, c) => a + c, 0);
-    const averageRating = addedRatings / (ratings.length - 1);
-    const timeslots = await getTimeslotsByUserId(user.id);
-    console.log(timeslots);
 
     if (!user) {
       response.status(404).json({
@@ -44,7 +39,11 @@ export default async function protectedUserHandler(
       });
       return;
     }
-    // console.log(user);
+
+    const ratings = await getRatingByUserId(user.id);
+    const addedRatings = ratings.reduce((a, c) => a + c, 0);
+    const averageRating = addedRatings / (ratings.length - 1);
+    const timeslots = await getTimeslotsByUserId(user.id);
 
     response.json({
       user: {

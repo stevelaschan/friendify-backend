@@ -9,7 +9,6 @@ export default async function createNewTimeSlotHandler(request, response) {
       provider.id,
       user.date,
       user.time,
-      user.timeslotSet,
     );
     // console.log(newTimeslot);
     response.json(newTimeslot);

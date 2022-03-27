@@ -8,6 +8,7 @@ import {
   getTimeslotsByUserId,
   getUserWithPasswordHashByUsername,
   Rating,
+  Timeslot,
   User,
 } from '../../util/database';
 
@@ -22,7 +23,7 @@ type LoginNextApiRequest = Omit<NextApiRequest, 'body'> & {
 
 export type LoginResponseBody =
   | { errors: { message: string }[] }
-  | { user: User; provider: Rating };
+  | { user: User; provider: number; timeslots: Timeslot[] };
 
 export default async function loginHandler(
   request: LoginNextApiRequest,
@@ -90,7 +91,9 @@ export default async function loginHandler(
     // 4. get ratings and timeslots by user id
     const timeslots = await getTimeslotsByUserId(userWithPasswordHash.id);
     const ratings = await getRatingByUserId(userWithPasswordHash.id);
-    const averageRating = ratings.reduce((a, c) => a + c, 0) / ratings.length;
+    const ratingArray = ratings.map((rating: Rating) => rating.rating);
+    const averageRating =
+      ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
     // console.log(averageRating);
 
     // 5. Add the cookie to the header response

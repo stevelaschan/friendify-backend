@@ -3,6 +3,7 @@ import {
   getProviderIdByUserId,
   getTimeslotsByUserId,
   getUserById,
+  Timeslot,
 } from '../../util/database';
 
 type ProviderProfileRequestBody = {
@@ -29,6 +30,7 @@ type ProviderProfileResponseBody = {
         userId: number;
       }
     | undefined;
+  timeslots: Timeslot[];
 };
 
 type ProviderProfileNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -45,7 +47,7 @@ export default async function getRestrictedProfile(
     const providerProfile = await getUserById(userId);
     const providerId = await getProviderIdByUserId(userId);
     const providerTimeslots = await getTimeslotsByUserId(userId);
-    // console.log('provider Id', providerId);
+    console.log('provider Id', providerTimeslots);
     response.json({
       profile: providerProfile,
       id: providerId,
