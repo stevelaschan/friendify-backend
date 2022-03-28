@@ -1,12 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createProvider, updateUserByUsername } from '../../util/database';
 
-type UpdateProfileRequestBody = {
-  firstName: string;
-  lastName: string;
-  age: string;
-  shortDescription: string;
-};
+type UpdateProfileRequestBody = string;
 
 type UpdateProfileResponseBody =
   | {

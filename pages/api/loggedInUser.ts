@@ -48,11 +48,11 @@ export default async function protectedUserHandler(
 
     const timeslots = await getTimeslotsByUserId(user.id);
 
-    console.log(timeslots);
+    // console.log(ratings);
 
     response.json({
       user: user,
-      provider: averageRating,
+      rating: averageRating,
       timeslots: timeslots,
     });
     return;

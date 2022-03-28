@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   getProviderIdByUserId,
+  getRatingByUserId,
   getTimeslotsByUserId,
   getUserById,
+  Rating,
   Timeslot,
 } from '../../util/database';
 
@@ -44,11 +46,17 @@ export default async function getRestrictedProfile(
     const providerProfile = await getUserById(userId);
     const providerId = await getProviderIdByUserId(userId);
     const providerTimeslots = await getTimeslotsByUserId(userId);
+    const ratings = await getRatingByUserId(userId);
+    const ratingArray = ratings.map((rating: Rating) => rating.rating);
+    const averageRating =
+      ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
+
     // console.log('provider Id', providerTimeslots);
     response.json({
       profile: providerProfile,
       id: providerId,
       timeslots: providerTimeslots,
+      rating: averageRating,
     });
     return;
   }
