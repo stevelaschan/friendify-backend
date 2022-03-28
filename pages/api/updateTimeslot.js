@@ -1,9 +1,9 @@
 import { updateTimeslotWithUsername } from '../../util/database';
 
-export default async function updateTimeslotHandler(request) {
+export default async function updateTimeslotHandler(request, response) {
   if (request.method === 'PUT') {
     const updateTimeslot = JSON.parse(request.body);
-    await updateTimeslotWithUsername(
+    const updatedTimeslot = await updateTimeslotWithUsername(
       updateTimeslot.username,
       updateTimeslot.providerId,
       updateTimeslot.time,
@@ -11,7 +11,7 @@ export default async function updateTimeslotHandler(request) {
     );
 
     // console.log(updatedTimeslot);
-    // response.json(updateUser);
+    response.json(updatedTimeslot);
     return;
   }
 }

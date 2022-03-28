@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
+  getAllProviders,
+  getAllRatings,
   getAllUsers,
-  getProviderIdByUserId,
-  getRatingByUserId,
   User,
 } from '../../util/database';
 
@@ -20,27 +20,26 @@ type ProviderIds = {
 
 export default async function getUsersHandler(
   request: getUsersNextApiRequest,
-  response: NextApiResponse<User[], ProviderRatings[], ProviderIds>,
+  response: NextApiResponse<{users: User[]}>,
 ) {
   if (request.method === 'GET') {
     const users = await getAllUsers();
-    const providerRatings = async () => {
-      for (const user of users) {
-        await getRatingByUserId(user.id);
-        // console.log(ratings);
-      }
-    };
-    // await providerRatings();
+    // const providerRatings = async () => {
+    //   for (const user of users) {
+    //     const ratings = await getRatingByUserId(user.id);
+    //     console.log(ratings);
+    //     return ratings;
+    //   }
+    // };
 
-    const providerIds = async () => {
-      for (const user of users) {
-        const providerId = await getProviderIdByUserId(user.id);
-        console.log(providerId);
-      }
-    };
-    await providerIds();
+    const providerRatings = await getAllRatings();
+    const providerIds = await getAllProviders();
 
-    response.json(users, providerRatings, providerIds);
+    users.forEach((user) => {});
+
+    // console.log(providerIds);
+
+    response.json({ users: users });
     return;
   }
 }

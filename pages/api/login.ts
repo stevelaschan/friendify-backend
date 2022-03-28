@@ -94,6 +94,7 @@ export default async function loginHandler(
     const ratingArray = ratings.map((rating: Rating) => rating.rating);
     const averageRating =
       ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
+
     // console.log(averageRating);
 
     // 5. Add the cookie to the header response

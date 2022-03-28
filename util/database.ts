@@ -73,7 +73,7 @@ export async function createUser(
       first_name,
       last_name,
       age,
-      username
+      username,
       short_description,
       is_provider
   `;
@@ -142,7 +142,7 @@ export async function getUserByUsername(username: string) {
 
 // all users
 export async function getAllUsers() {
-  const users = await sql<[User | undefined]>`
+  const users = await sql<User[]>`
     SELECT
     id,
     username,
@@ -212,7 +212,7 @@ export type Provider =
 
 // CREATE
 export async function createProvider(userId: number) {
-  const [provider] = await sql<[Provider]>`
+  const [provider] = await sql<Provider[]>`
     INSERT INTO providers
       (user_id)
     VALUES
@@ -236,6 +236,15 @@ export async function getProviderIdByUserId(id: number) {
       user_id = ${id}
   `;
   return provider && camelcaseKeys(provider);
+}
+export async function getAllProviders() {
+  const providers = await sql<[Provider | undefined]>`
+    SELECT
+      *
+    FROM
+      providers
+  `;
+  return providers;
 }
 
 // RATING
@@ -264,23 +273,9 @@ export async function createRating(
   return stars && camelcaseKeys(stars);
 }
 
-// READ
-// export async function getRatingByProviderId(id: number) {
-//   const stars = await sql<[Rating | undefined]>`
-//     SELECT
-//       *
-//     FROM
-//       ratings
-//     WHERE
-//       provider_id = ${id}
-//   `;
-//   return stars;
-// }
-
 export async function getRatingByUserId(id: number) {
   const stars = await sql<[Rating | undefined]>`
     SELECT
-      ratings.id,
       ratings.user_id,
       ratings.provider_id,
       ratings.rating
@@ -293,6 +288,16 @@ export async function getRatingByUserId(id: number) {
   `;
   return camelcaseKeys(stars);
   // return stars.map((star) => camelcaseKeys(star));
+}
+
+export async function getAllRatings() {
+  const stars = await sql<Rating[]>`
+    SELECT
+      *
+    FROM
+      ratings
+  `;
+  return stars.map((star: Rating) => camelcaseKeys(star));
 }
 
 // SESSION TOKEN
@@ -352,7 +357,7 @@ export async function deleteSessionByToken(token: string) {
 }
 
 export async function deleteExpiredSessions() {
-  const sessions = await sql<[Session | undefined]>`
+  const sessions = await sql<Session[]>`
     DELETE FROM
       sessions
     WHERE
@@ -369,6 +374,7 @@ export type Timeslot = {
   providerId: number;
   timeslotDate: Date;
   timeslotTime: string;
+  userUsername: string | null;
 };
 
 // CREATE
@@ -397,7 +403,8 @@ export async function getTimeslotsByUserId(id: number) {
       timeslots.id,
       timeslots.provider_id,
       timeslots.timeslot_date,
-      timeslots.timeslot_time
+      timeslots.timeslot_time,
+      timeslots.user_username
     FROM
       timeslots,
       providers
@@ -425,8 +432,9 @@ export async function updateTimeslotWithUsername(
       provider_id = ${providerId} AND
       timeslot_time = ${timeslotTime} AND
       timeslot_date = ${timeslotDate}
+    RETURNING *
   `;
-  return updatedTimeslots;
+  return camelcaseKeys(updatedTimeslots);
 }
 
 // DELETE

@@ -4,6 +4,7 @@ import {
   getTimeslotsByUserId,
   getUserByValidSessionToken,
   Rating,
+  Timeslot,
   User,
 } from '../../util/database';
 
@@ -21,7 +22,7 @@ type ProtectedUserNextApiRequest = Omit<NextApiRequest, 'body'> & {
 
 type ProtectedUserResponseBody =
   | { error: string }
-  | { user: User; provider: Rating }
+  | { user: User; provider: number; timeslots: Timeslot[] }
   | undefined;
 
 export default async function protectedUserHandler(
@@ -41,20 +42,16 @@ export default async function protectedUserHandler(
     }
 
     const ratings = await getRatingByUserId(user.id);
-    const addedRatings = ratings.reduce((a, c) => a + c, 0);
-    const averageRating = addedRatings / (ratings.length - 1);
+    const ratingArray = ratings.map((rating: Rating) => rating.rating);
+    const averageRating =
+      ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
+
     const timeslots = await getTimeslotsByUserId(user.id);
 
+    console.log(timeslots);
+
     response.json({
-      user: {
-        id: user.id,
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        age: user.age,
-        shortDescription: user.shortDescription,
-        isProvider: user.isProvider,
-      },
+      user: user,
       provider: averageRating,
       timeslots: timeslots,
     });

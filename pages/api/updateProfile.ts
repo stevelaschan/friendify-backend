@@ -30,7 +30,6 @@ export default async function updateUserHandler(
 ) {
   if (request.method === 'PUT') {
     const userUpdateRequest = JSON.parse(request.body);
-    // console.log('isprovider', userUpdateRequest);
     const updateUser = await updateUserByUsername(
       userUpdateRequest.username,
       userUpdateRequest.firstName,
@@ -43,7 +42,7 @@ export default async function updateUserHandler(
     (await userUpdateRequest.isProvider) &&
       createProvider(userUpdateRequest.id);
 
-    // console.log(updateUser);
+    console.log(updateUser);
     response.json(updateUser);
     return;
   }

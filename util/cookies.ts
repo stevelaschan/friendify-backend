@@ -1,6 +1,4 @@
 import { serialize } from 'cookie';
-import Cookies from 'js-cookie';
-
 
 export function createSerializedRegisterSessionTokenCookie(token: string) {
   // check if we are in production e.g. Heroku

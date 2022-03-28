@@ -9,7 +9,7 @@ type CreateRating = {
 };
 
 type CreateRatingNextApiRequest = Omit<NextApiRequest, 'body'> & {
-  body: CreateRating;
+  body: string;
 };
 
 type CreateRatingResponseBody = CreateRating | undefined;

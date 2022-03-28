@@ -6,12 +6,7 @@ import {
   Timeslot,
 } from '../../util/database';
 
-type ProviderProfileRequestBody = {
-  firstName: string;
-  lastName: string;
-  age: string;
-  shortDescription: string;
-};
+type ProviderProfileRequestBody = string;
 
 type ProviderProfileResponseBody = {
   profile:
@@ -43,11 +38,13 @@ export default async function getRestrictedProfile(
 ) {
   if (request.method === 'POST') {
     const userId = JSON.parse(request.body).id;
+    // const userId = request.body.id;
+    console.log(request.body);
 
     const providerProfile = await getUserById(userId);
     const providerId = await getProviderIdByUserId(userId);
     const providerTimeslots = await getTimeslotsByUserId(userId);
-    console.log('provider Id', providerTimeslots);
+    // console.log('provider Id', providerTimeslots);
     response.json({
       profile: providerProfile,
       id: providerId,
