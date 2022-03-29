@@ -12,6 +12,7 @@ type ProviderProfileRequestBody = string;
 type ProviderProfileResponseBody = {
   profile:
     | {
+        id: number;
         username: string;
         firstName: string;
         lastName: string;
@@ -20,13 +21,8 @@ type ProviderProfileResponseBody = {
         isProvider: boolean;
       }
     | undefined;
-  id:
-    | {
-        id: number;
-        userId: number;
-      }
-    | undefined;
-  timeslots: Timeslot[];
+  timeslots: Timeslot[] | undefined;
+  rating: number;
 };
 
 type ProviderProfileNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -40,7 +36,7 @@ export default async function getRestrictedProfile(
   if (request.method === 'POST') {
     const userId = JSON.parse(request.body).id;
     // const userId = request.body.id;
-    console.log(request.body);
+    // console.log(request.body);
 
     const providerProfile = await getUserById(userId);
     const providerTimeslots = await getTimeslotsByUserId(userId);
@@ -49,7 +45,7 @@ export default async function getRestrictedProfile(
     const averageRating =
       ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
 
-    // console.log('provider Id', providerTimeslots);
+    console.log('provider Id', providerTimeslots);
     response.json({
       profile: providerProfile,
       timeslots: providerTimeslots,

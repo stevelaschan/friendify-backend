@@ -11,11 +11,9 @@ type LogoutNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: LogoutRequestBody;
 };
 
-type LogoutResponseBody = {};
-
 export default async function LogoutHandler(
   request: LogoutNextApiRequest,
-  response: NextApiResponse<LogoutResponseBody>,
+  response: NextApiResponse<void>,
 ) {
   if (request.method === 'DELETE') {
     // 1. get the cookie from  the session token

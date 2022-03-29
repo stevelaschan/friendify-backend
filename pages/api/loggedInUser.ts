@@ -22,7 +22,7 @@ type ProtectedUserNextApiRequest = Omit<NextApiRequest, 'body'> & {
 
 type ProtectedUserResponseBody =
   | { error: string }
-  | { user: User; provider: number; timeslots: Timeslot[] }
+  | { user: User; rating: number; timeslots: Timeslot[] }
   | undefined;
 
 export default async function protectedUserHandler(

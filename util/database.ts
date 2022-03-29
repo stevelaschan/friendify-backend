@@ -85,12 +85,7 @@ export async function createUser(
 export async function getUserById(id: number) {
   const [user] = await sql<[User | undefined]>`
     SELECT
-      first_name,
-      last_name,
-      age,
-      username,
-      short_description,
-      is_provider
+      *
     FROM
       users
     WHERE
@@ -228,16 +223,16 @@ export async function createRating(
 }
 
 export async function getRatingByUserId(id: number) {
-  const stars = await sql<[Rating | undefined]>`
+  const stars = await sql<Rating[]>`
     SELECT
       *
     FROM
       ratings
     WHERE
-      provider_id = ${id}
+      user_id = ${id}
   `;
-  return camelcaseKeys(stars);
-  // return stars.map((star) => camelcaseKeys(star));
+  // return camelcaseKeys(stars);
+  return stars.map((star) => camelcaseKeys(star));
 }
 
 export async function getAllRatings() {
@@ -348,7 +343,7 @@ export async function createNewTimeslot(
 // READ
 
 export async function getTimeslotsByUserId(id: number) {
-  const reservedTimeslots = await sql`
+  const reservedTimeslots = await sql<Timeslot[]>`
     SELECT
       *
     FROM
