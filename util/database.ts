@@ -201,52 +201,6 @@ export async function updateUserByUsername(
   return user && camelcaseKeys(user);
 }
 
-// PROVIDER
-
-export type Provider =
-  | {
-      id: number;
-      userId: number;
-    }
-  | undefined;
-
-// CREATE
-export async function createProvider(userId: number) {
-  const [provider] = await sql<Provider[]>`
-    INSERT INTO providers
-      (user_id)
-    VALUES
-      (${userId})
-    RETURNING
-      id,
-      user_id
-  `;
-  return camelcaseKeys(provider);
-}
-
-// READ
-// by id by user id
-export async function getProviderIdByUserId(id: number) {
-  const [provider] = await sql<[Provider | undefined]>`
-    SELECT
-      *
-    FROM
-      providers
-    WHERE
-      user_id = ${id}
-  `;
-  return provider && camelcaseKeys(provider);
-}
-export async function getAllProviders() {
-  const providers = await sql<[Provider | undefined]>`
-    SELECT
-      *
-    FROM
-      providers
-  `;
-  return providers;
-}
-
 // RATING
 
 export type Rating = {
@@ -276,15 +230,11 @@ export async function createRating(
 export async function getRatingByUserId(id: number) {
   const stars = await sql<[Rating | undefined]>`
     SELECT
-      ratings.user_id,
-      ratings.provider_id,
-      ratings.rating
+      *
     FROM
-      ratings,
-      providers
+      ratings
     WHERE
-      providers.user_id = ${id} AND
-      providers.id = ratings.provider_id
+      provider_id = ${id}
   `;
   return camelcaseKeys(stars);
   // return stars.map((star) => camelcaseKeys(star));
@@ -400,17 +350,11 @@ export async function createNewTimeslot(
 export async function getTimeslotsByUserId(id: number) {
   const reservedTimeslots = await sql`
     SELECT
-      timeslots.id,
-      timeslots.provider_id,
-      timeslots.timeslot_date,
-      timeslots.timeslot_time,
-      timeslots.user_username
+      *
     FROM
-      timeslots,
-      providers
+      timeslots
     WHERE
-      providers.user_id = ${id} AND
-      providers.id = timeslots.provider_id
+      provider_id = ${id}
   `;
   return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
 }

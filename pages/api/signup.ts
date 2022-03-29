@@ -3,7 +3,6 @@ import bcrypt from 'bcrypt';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 import {
-  createProvider,
   createSession,
   createUser,
   getUserByUsername,
@@ -72,9 +71,6 @@ export default async function signupHandler(
       request.body.shortDescription,
       request.body.isProvider,
     );
-
-    // create provider id
-    await createProvider(user.id);
 
     // 1. Create a unique token
     const token = crypto.randomBytes(64).toString('base64');

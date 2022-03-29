@@ -1,10 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  getAllProviders,
-  getAllRatings,
-  getAllUsers,
-  User,
-} from '../../util/database';
+import { getAllRatings, getAllUsers, User } from '../../util/database';
 
 type getUsersNextApiRequest = Omit<NextApiRequest, 'body'>;
 
@@ -20,7 +15,7 @@ type ProviderIds = {
 
 export default async function getUsersHandler(
   request: getUsersNextApiRequest,
-  response: NextApiResponse<{users: User[]}>,
+  response: NextApiResponse<{ users: User[] }>,
 ) {
   if (request.method === 'GET') {
     const users = await getAllUsers();
@@ -33,7 +28,6 @@ export default async function getUsersHandler(
     // };
 
     const providerRatings = await getAllRatings();
-    const providerIds = await getAllProviders();
 
     users.forEach((user) => {});
 
