@@ -25,7 +25,7 @@ export default async function getProvidersHandler(request, response) {
       return provider;
     });
 
-    // console.log(providerWithRatings);
+    console.log(providerWithRatings);
 
     response.json(providers);
     return;
