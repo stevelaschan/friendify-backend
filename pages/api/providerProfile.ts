@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   getRatingByUserId,
-  getTimeslotsByUserId,
+  getTimeslotsByProviderUsername,
   getUserById,
   Rating,
   Timeslot,
@@ -35,11 +35,10 @@ export default async function getRestrictedProfile(
 ) {
   if (request.method === 'POST') {
     const userId = JSON.parse(request.body).id;
-    // const userId = request.body.id;
-    // console.log(request.body);
+    const username = JSON.parse(request.body).username;
 
     const providerProfile = await getUserById(userId);
-    const providerTimeslots = await getTimeslotsByUserId(userId);
+    const providerTimeslots = await getTimeslotsByProviderUsername(username);
     const ratings = await getRatingByUserId(userId);
     const ratingArray = ratings.map((rating: Rating) => rating.rating);
     const averageRating =

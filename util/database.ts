@@ -316,7 +316,7 @@ export async function deleteExpiredSessions() {
 // TIMESLOTS
 export type Timeslot = {
   id: number;
-  providerId: number;
+  providerUsername: string;
   timeslotDate: Date;
   timeslotTime: string;
   userUsername: string | null;
@@ -324,15 +324,15 @@ export type Timeslot = {
 
 // CREATE
 export async function createNewTimeslot(
-  providerId: number,
+  providerUsername: string,
   date: Date,
   time: string,
 ) {
   const [timeslot] = await sql<[Timeslot | undefined]>`
   INSERT INTO timeslots
-    (provider_id, timeslot_date, timeslot_time)
+    (provider_username, timeslot_date, timeslot_time)
   VALUES
-    (${providerId}, ${date}, ${time} )
+    (${providerUsername}, ${date}, ${time} )
   RETURNING
     *
   `;
@@ -342,14 +342,14 @@ export async function createNewTimeslot(
 
 // READ
 
-export async function getTimeslotsByUserId(id: number) {
+export async function getTimeslotsByProviderUsername(providerUsername: string) {
   const reservedTimeslots = await sql<Timeslot[]>`
     SELECT
       *
     FROM
       timeslots
     WHERE
-      provider_id = ${id}
+      provider_username = ${providerUsername}
   `;
   return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
 }
@@ -358,17 +358,17 @@ export async function getTimeslotsByUserId(id: number) {
 
 export async function updateTimeslotWithUsername(
   username: string,
-  providerId: number,
+  providerUsername: string,
   timeslotTime: string,
   timeslotDate: Date,
 ) {
-  const updatedTimeslots = await sql`
+  const [updatedTimeslots] = await sql`
     UPDATE
       timeslots
     SET
       user_username = ${username}
     WHERE
-      provider_id = ${providerId} AND
+      provider_Username = ${providerUsername} AND
       timeslot_time = ${timeslotTime} AND
       timeslot_date = ${timeslotDate}
     RETURNING *
@@ -379,7 +379,7 @@ export async function updateTimeslotWithUsername(
 // DELETE
 
 export async function deleteTimeslot(
-  providerId: number,
+  providerUsername: string,
   timeslotDate: Date,
   timeslotTime: string,
 ) {
@@ -387,7 +387,7 @@ export async function deleteTimeslot(
     DELETE FROM
       timeslots
     WHERE
-      provider_id = ${providerId} AND
+      provider_username = ${providerUsername} AND
       timeslot_date = ${timeslotDate} AND
       timeslot_time = ${timeslotTime}
     RETURNING

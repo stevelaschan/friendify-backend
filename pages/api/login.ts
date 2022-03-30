@@ -5,7 +5,7 @@ import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 import {
   createSession,
   getRatingByUserId,
-  getTimeslotsByUserId,
+  getTimeslotsByProviderUsername,
   getUserWithPasswordHashByUsername,
   Rating,
   Timeslot,
@@ -89,13 +89,15 @@ export default async function loginHandler(
     );
 
     // 4. get ratings and timeslots by user id
-    const timeslots = await getTimeslotsByUserId(userWithPasswordHash.id);
+    const timeslots = await getTimeslotsByProviderUsername(
+      userWithPasswordHash.username,
+    );
     const ratings = await getRatingByUserId(userWithPasswordHash.id);
     const ratingArray = ratings.map((rating: Rating) => rating.rating);
     const averageRating =
       ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
 
-    console.log(timeslots);
+    // console.log(timeslots);
 
     // 5. Add the cookie to the header response
     response
