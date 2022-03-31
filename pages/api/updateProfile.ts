@@ -13,6 +13,7 @@ type UpdateProfileResponseBody =
       shortDescription: string;
       isProvider: boolean;
     }
+  | { errors: { message: string }[] }
   | undefined;
 
 type UpdateProfileNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -37,4 +38,5 @@ export default async function updateUserHandler(
     response.status(200).json(updateUser);
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

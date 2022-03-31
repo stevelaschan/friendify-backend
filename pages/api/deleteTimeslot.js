@@ -8,5 +8,5 @@ export default async function LogoutHandler(request, response) {
     response.status(200).json(timeslot);
     // console.log(timeslot);
   }
-  return;
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

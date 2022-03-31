@@ -5,7 +5,9 @@ type UserNextApiRequest = Omit<NextApiRequest, 'body'>;
 
 export default async function getUsersHandler(
   request: UserNextApiRequest,
-  response: NextApiResponse<{ users: User[] }>,
+  response: NextApiResponse<
+    { users: User[] } | { errors: { message: string }[] }
+  >,
 ) {
   if (request.method === 'GET') {
     const users = await getAllUsers();
@@ -13,4 +15,5 @@ export default async function getUsersHandler(
     response.status(200).json({ users: users });
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

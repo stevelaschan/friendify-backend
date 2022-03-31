@@ -23,6 +23,7 @@ type ProtectedUserNextApiRequest = Omit<NextApiRequest, 'body'> & {
 type ProtectedUserResponseBody =
   | { error: string }
   | { user: User; rating: number; timeslots: Timeslot[] }
+  | { errors: { message: string }[] }
   | undefined;
 
 export default async function protectedUserHandler(
@@ -57,4 +58,5 @@ export default async function protectedUserHandler(
     });
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

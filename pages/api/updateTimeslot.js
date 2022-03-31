@@ -14,4 +14,5 @@ export default async function updateTimeslotHandler(request, response) {
     response.status(200).json(updatedTimeslot);
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

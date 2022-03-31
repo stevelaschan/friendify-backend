@@ -33,5 +33,4 @@ export default async function LogoutHandler(
       )
       .send();
   }
-  return;
 }

@@ -12,7 +12,10 @@ type CreateRatingNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: string;
 };
 
-type CreateRatingResponseBody = CreateRating | undefined;
+type CreateRatingResponseBody =
+  | CreateRating
+  | { errors: { message: string }[] }
+  | undefined;
 
 export default async function updateUserHandler(
   request: CreateRatingNextApiRequest,
@@ -28,4 +31,5 @@ export default async function updateUserHandler(
     response.status(200).json(setRating);
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

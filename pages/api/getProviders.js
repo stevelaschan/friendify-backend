@@ -17,4 +17,5 @@ export default async function getProvidersHandler(request, response) {
     response.status(200).json({ providers: providers, ratings: ratings });
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

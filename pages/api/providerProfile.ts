@@ -9,21 +9,23 @@ import {
 
 type ProviderProfileRequestBody = string;
 
-type ProviderProfileResponseBody = {
-  profile:
-    | {
-        id: number;
-        username: string;
-        firstName: string;
-        lastName: string;
-        age: string;
-        shortDescription: string;
-        isProvider: boolean;
-      }
-    | undefined;
-  timeslots: Timeslot[] | undefined;
-  rating: number;
-};
+type ProviderProfileResponseBody =
+  | {
+      profile:
+        | {
+            id: number;
+            username: string;
+            firstName: string;
+            lastName: string;
+            age: string;
+            shortDescription: string;
+            isProvider: boolean;
+          }
+        | undefined;
+      timeslots: Timeslot[] | undefined;
+      rating: number;
+    }
+  | { errors: { message: string }[] };
 
 type ProviderProfileNextApiRequest = Omit<NextApiRequest, 'body'> & {
   body: ProviderProfileRequestBody;
@@ -51,4 +53,5 @@ export default async function getRestrictedProfile(
     });
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

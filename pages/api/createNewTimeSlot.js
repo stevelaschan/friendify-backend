@@ -13,4 +13,5 @@ export default async function createNewTimeSlotHandler(request, response) {
     response.status(200).json(newTimeslot);
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }

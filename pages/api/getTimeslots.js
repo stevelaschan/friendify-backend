@@ -8,4 +8,5 @@ export default async function getUserTimeslotsHandler(request, response) {
     response.status(200).json(timeslots);
     return;
   }
+  response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }
