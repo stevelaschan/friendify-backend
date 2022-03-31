@@ -3,8 +3,6 @@ import { config } from 'dotenv-safe';
 import postgres from 'postgres';
 import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
-// import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku.js';
-
 setPostgresDefaultsOnHeroku();
 
 config();
@@ -20,7 +18,7 @@ function connectOneTimeToDatabase() {
   let sql;
 
   if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
-    sql = postgres();
+    // sql = postgres();
     // Heroku needs SSL connections but
     // has an "unauthorized" certificate
     // https://devcenter.heroku.com/changelog-items/852
