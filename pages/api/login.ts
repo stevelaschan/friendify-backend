@@ -94,9 +94,13 @@ export default async function loginHandler(
     );
     const ratings = await getRatingByUserId(userWithPasswordHash.id);
     const ratingArray = ratings.map((rating: Rating) => rating.rating);
-    const averageRating =
-      ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
-
+    let averageRating;
+    if (Number.isNaN(averageRating)) {
+      averageRating = 0;
+    } else {
+      averageRating =
+        ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
+    }
     // 5. Add the cookie to the header response
     response
       .status(201)

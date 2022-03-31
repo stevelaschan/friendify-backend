@@ -50,7 +50,7 @@ export default async function protectedUserHandler(
 
     console.log(ratings);
 
-    response.json({
+    response.status(200).json({
       user: user,
       rating: averageRating,
       timeslots: timeslots,

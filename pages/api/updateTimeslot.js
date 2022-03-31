@@ -11,7 +11,7 @@ export default async function updateTimeslotHandler(request, response) {
     );
 
     // console.log(updatedTimeslot);
-    response.json(updatedTimeslot);
+    response.status(200).json(updatedTimeslot);
     return;
   }
 }

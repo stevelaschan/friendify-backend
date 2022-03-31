@@ -5,7 +5,7 @@ export default async function getUserTimeslotsHandler(request, response) {
     const timeslots = await getTimeslots();
 
     // console.log(timeslots);
-    response.json(timeslots);
+    response.status(200).json(timeslots);
     return;
   }
 }

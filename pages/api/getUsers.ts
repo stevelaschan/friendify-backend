@@ -10,7 +10,7 @@ export default async function getUsersHandler(
   if (request.method === 'GET') {
     const users = await getAllUsers();
 
-    response.json({ users: users });
+    response.status(200).json({ users: users });
     return;
   }
 }

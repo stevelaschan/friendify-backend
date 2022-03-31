@@ -25,7 +25,7 @@ export default async function updateUserHandler(
     const rating = JSON.parse(request.body).rating;
 
     const setRating = await createRating(userId, providerId.id, rating);
-    response.json(setRating);
+    response.status(200).json(setRating);
     return;
   }
 }

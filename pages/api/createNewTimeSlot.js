@@ -10,7 +10,7 @@ export default async function createNewTimeSlotHandler(request, response) {
       provider.time,
     );
     // console.log(newTimeslot);
-    response.json(newTimeslot);
+    response.status(200).json(newTimeslot);
     return;
   }
 }

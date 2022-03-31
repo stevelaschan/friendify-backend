@@ -12,21 +12,9 @@ export default async function getProvidersHandler(request, response) {
       return providers;
     });
 
-    // for (const provider of providers) {
-    //   const allRatings = await getRatingByUserId(provider.id);
-    //   allRatings.map((rating) => {
-    //     if (rating.providerId === provider.id) {
-    //       ratings[provider.id] = ratings[provider.id]
-    //         ? [...ratings[provider.id], rating]
-    //         : [rating];
-    //     }
-    //     return ratings
-    //   });
-    // }
-
     const ratings = await getAllRatings();
 
-    response.json({ providers: providers, ratings: ratings });
+    response.status(200).json({ providers: providers, ratings: ratings });
     return;
   }
 }

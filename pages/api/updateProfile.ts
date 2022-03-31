@@ -34,7 +34,7 @@ export default async function updateUserHandler(
       userUpdateRequest.isProvider,
     );
 
-    response.json(updateUser);
+    response.status(200).json(updateUser);
     return;
   }
 }
