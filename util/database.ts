@@ -135,6 +135,19 @@ export async function getUserByUsername(username: string) {
   return user && camelcaseKeys(user);
 }
 
+// get user id by username
+export async function getUserIdByUsername(username: string) {
+  const [user] = await sql`
+    SELECT
+      id
+    FROM
+      users
+    WHERE
+      username = ${username}
+  `
+  return user
+}
+
 // all users
 export async function getAllUsers() {
   const users = await sql<User[]>`
@@ -222,6 +235,7 @@ export async function createRating(
   return stars && camelcaseKeys(stars);
 }
 
+// READ
 export async function getRatingByUserId(id: number) {
   const stars = await sql<Rating[]>`
     SELECT
@@ -229,7 +243,7 @@ export async function getRatingByUserId(id: number) {
     FROM
       ratings
     WHERE
-      user_id = ${id}
+      provider_id = ${id}
   `;
   // return camelcaseKeys(stars);
   return stars.map((star) => camelcaseKeys(star));
@@ -352,6 +366,16 @@ export async function getTimeslotsByProviderUsername(providerUsername: string) {
       provider_username = ${providerUsername}
   `;
   return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
+}
+
+export async function getTimeslots() {
+  const bookedTimeslots = await sql<Timeslot[]>`
+    SELECT
+      *
+    FROM
+      timeslots
+  `;
+  return bookedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
 }
 
 // UPDATE

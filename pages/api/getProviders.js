@@ -1,4 +1,4 @@
-import { getAllUsers, getRatingByUserId } from '../../util/database';
+import { getAllRatings, getAllUsers } from '../../util/database';
 
 export default async function getProvidersHandler(request, response) {
   if (request.method === 'GET') {
@@ -12,22 +12,21 @@ export default async function getProvidersHandler(request, response) {
       return providers;
     });
 
-    const providerWithRatings = [];
+    // for (const provider of providers) {
+    //   const allRatings = await getRatingByUserId(provider.id);
+    //   allRatings.map((rating) => {
+    //     if (rating.providerId === provider.id) {
+    //       ratings[provider.id] = ratings[provider.id]
+    //         ? [...ratings[provider.id], rating]
+    //         : [rating];
+    //     }
+    //     return ratings
+    //   });
+    // }
 
-    providers.forEach(async (provider) => {
-      const ratings = await getRatingByUserId(provider.id);
-      ratings.map((rating) => {
-        if (provider.id === rating.providerId) {
-          providerWithRatings[provider.id] = [...provider, rating];
-        }
-        return undefined;
-      });
-      return provider;
-    });
+    const ratings = await getAllRatings();
 
-    console.log(providerWithRatings);
-
-    response.json(providers);
+    response.json({ providers: providers, ratings: ratings });
     return;
   }
 }

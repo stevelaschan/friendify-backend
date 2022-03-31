@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createRating } from '../../util/database';
+import { createRating, getUserIdByUsername } from '../../util/database';
 
 type CreateRating = {
   id: number;
@@ -20,10 +20,11 @@ export default async function updateUserHandler(
 ) {
   if (request.method === 'POST') {
     const userId = JSON.parse(request.body).userId;
-    const providerId = JSON.parse(request.body).providerId;
+    const providerUsername = JSON.parse(request.body).providerUsername;
+    const providerId = await getUserIdByUsername(providerUsername);
     const rating = JSON.parse(request.body).rating;
-    const setRating = await createRating(userId, providerId, rating);
-    // console.log(setRating);
+
+    const setRating = await createRating(userId, providerId.id, rating);
     response.json(setRating);
     return;
   }

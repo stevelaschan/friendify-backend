@@ -44,7 +44,6 @@ export default async function getRestrictedProfile(
     const averageRating =
       ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
 
-    // console.log('provider Id', providerTimeslots);
     response.json({
       profile: providerProfile,
       timeslots: providerTimeslots,
