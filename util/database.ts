@@ -1,13 +1,12 @@
 import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
 import postgres from 'postgres';
+import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
 // import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku.js';
 
-// setPostgresDefaultsOnHeroku();
-// Read the environment variables from the .env
-// file, which will then be available for all
-// following code
+setPostgresDefaultsOnHeroku();
+
 config();
 
 // Type needed for the connection function below
@@ -144,8 +143,8 @@ export async function getUserIdByUsername(username: string) {
       users
     WHERE
       username = ${username}
-  `
-  return user
+  `;
+  return user;
 }
 
 // all users
