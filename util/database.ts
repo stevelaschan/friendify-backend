@@ -353,14 +353,27 @@ export async function createNewTimeslot(
 
 // READ
 
-export async function getTimeslotsByProviderUsername(providerUsername: string) {
+export async function getTimeslotsByProviderUsername(username: string) {
   const reservedTimeslots = await sql<Timeslot[]>`
     SELECT
       *
     FROM
       timeslots
     WHERE
-      provider_username = ${providerUsername}
+      provider_username = ${username}
+  `;
+  return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
+}
+
+export async function getTimeslotsByUsername(username: string) {
+  const reservedTimeslots = await sql<Timeslot[]>`
+    SELECT
+      *
+    FROM
+      timeslots
+    WHERE
+      provider_username = ${username} OR
+      user_username = ${username}
   `;
   return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
 }

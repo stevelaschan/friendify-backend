@@ -1,12 +1,23 @@
-import { getTimeslots } from '../../util/database';
+import { getTimeslotsByUsername } from '../../util/database';
 
 export default async function getUserTimeslotsHandler(request, response) {
-  if (request.method === 'GET') {
-    const timeslots = await getTimeslots();
+  if (request.method === 'POST') {
+    const timeslotByUsername = await getTimeslotsByUsername(
+      JSON.parse(request.body).username,
+    );
 
-    console.log(timeslots);
-    response.status(200).json(timeslots);
-    return;
+    const newState = {};
+
+    timeslotByUsername.forEach((timeslot) => {
+      const date = timeslot.timeslotDate.toISOString().split('T')[0];
+
+      // console.log('newState', newState[date]);
+      newState[date] = newState[date]
+        ? [...newState[date], timeslot]
+        : [timeslot];
+    });
+
+    response.status(200).json(newState);
   }
   response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }
