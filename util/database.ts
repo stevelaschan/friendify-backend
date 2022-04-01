@@ -246,15 +246,15 @@ export async function getRatingByUserId(id: number) {
   return stars.map((star) => camelcaseKeys(star));
 }
 
-export async function getAllRatings() {
-  const stars = await sql<Rating[]>`
-    SELECT
-      *
-    FROM
-      ratings
-  `;
-  return stars.map((star: Rating) => camelcaseKeys(star));
-}
+// export async function getAllRatings() {
+//   const stars = await sql<Rating[]>`
+//     SELECT
+//       *
+//     FROM
+//       ratings
+//   `;
+//   return stars.map((star: Rating) => camelcaseKeys(star));
+// }
 
 // SESSION TOKEN
 
