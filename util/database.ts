@@ -378,15 +378,15 @@ export async function getTimeslotsByUsername(username: string) {
   return reservedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
 }
 
-export async function getTimeslots() {
-  const bookedTimeslots = await sql<Timeslot[]>`
-    SELECT
-      *
-    FROM
-      timeslots
-  `;
-  return bookedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
-}
+// export async function getTimeslots() {
+//   const bookedTimeslots = await sql<Timeslot[]>`
+//     SELECT
+//       *
+//     FROM
+//       timeslots
+//   `;
+//   return bookedTimeslots.map((timeslot) => camelcaseKeys(timeslot));
+// }
 
 // UPDATE
 

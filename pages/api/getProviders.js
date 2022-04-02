@@ -12,9 +12,11 @@ export default async function getProvidersHandler(request, response) {
       return providers;
     });
 
-    const ratings = await getAllRatings();
+    const allProviderRatings = await getAllRatings();
 
-    response.status(200).json({ providers: providers, ratings: ratings });
+    response
+      .status(200)
+      .json({ providers: providers, allProviderRatings: allProviderRatings });
     return;
   }
   response.status(405).json({ errors: [{ message: 'Method not supported' }] });

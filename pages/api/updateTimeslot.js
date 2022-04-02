@@ -10,7 +10,7 @@ export default async function updateTimeslotHandler(request, response) {
       updateTimeslot.date,
     );
 
-    // console.log(updatedTimeslot);
+    console.log(updatedTimeslot);
     response.status(200).json(updatedTimeslot);
     return;
   }
