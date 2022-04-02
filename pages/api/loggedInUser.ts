@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   getRatingByUserId,
-  getTimeslotsByProviderUsername,
+  getTimeslotsByUsername,
   getUserByValidSessionToken,
   Rating,
   Timeslot,
@@ -47,7 +47,7 @@ export default async function protectedUserHandler(
     const averageRating =
       ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;
 
-    const timeslots = await getTimeslotsByProviderUsername(user.username);
+    const timeslots = await getTimeslotsByUsername(user.username);
 
     response.status(200).json({
       user: user,
