@@ -49,8 +49,6 @@ export default async function protectedUserHandler(
 
     const timeslots = await getTimeslotsByProviderUsername(user.username);
 
-    console.log(ratings);
-
     response.status(200).json({
       user: user,
       rating: averageRating,
