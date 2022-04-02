@@ -6,7 +6,7 @@ exports.up = async (sql) => {
       last_name varchar(30) NOT NULL,
       age integer NOT NULL,
       username varchar(20) NOT NULL UNIQUE,
-      password_hash varchar(80),
+      password_hash varchar(80) NOT NULL,
       short_description text,
       is_provider boolean
     )
