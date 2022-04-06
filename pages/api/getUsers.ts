@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getAllUsers, User } from '../../util/database';
+import {
+  getAllUsers,
+  getUserByValidSessionToken,
+  User,
+} from '../../util/database';
 
 type UserNextApiRequest = Omit<NextApiRequest, 'body'>;
 
@@ -10,6 +14,13 @@ export default async function getUsersHandler(
   >,
 ) {
   if (request.method === 'GET') {
+    const token = request.cookies.sessionToken;
+    // get user from session token
+    const user = await getUserByValidSessionToken(token);
+
+    if (!user) {
+      return;
+    }
     const users = await getAllUsers();
 
     response.status(200).json({ users: users });

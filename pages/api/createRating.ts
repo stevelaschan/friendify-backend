@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createRating, getUserIdByUsername } from '../../util/database';
+import {
+  createRating,
+  getUserByValidSessionToken,
+  getUserIdByUsername,
+} from '../../util/database';
 
 type CreateRating = {
   id: number;
@@ -8,8 +12,14 @@ type CreateRating = {
   rating: number;
 };
 
+type CreateRatingBody = {
+  userId: number;
+  providerUsername: string;
+  rating: number;
+};
+
 type CreateRatingNextApiRequest = Omit<NextApiRequest, 'body'> & {
-  body: string;
+  body: CreateRatingBody;
 };
 
 type CreateRatingResponseBody =
@@ -22,12 +32,21 @@ export default async function updateUserHandler(
   response: NextApiResponse<CreateRatingResponseBody>,
 ) {
   if (request.method === 'POST') {
-    const userId = JSON.parse(request.body).userId;
-    const providerUsername = JSON.parse(request.body).providerUsername;
-    const providerId = await getUserIdByUsername(providerUsername);
-    const rating = JSON.parse(request.body).rating;
+    const token = request.cookies.sessionToken;
+    // get user from session token
+    const user = await getUserByValidSessionToken(token);
 
-    const setRating = await createRating(userId, providerId.id, rating);
+    if (!user) {
+      return;
+    }
+    const providerUsername = request.body.providerUsername;
+    const providerId = await getUserIdByUsername(providerUsername);
+
+    const setRating = await createRating(
+      request.body.userId,
+      providerId.id,
+      request.body.rating,
+    );
     response.status(200).json(setRating);
     return;
   }

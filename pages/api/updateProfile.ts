@@ -1,7 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { updateUserByUsername } from '../../util/database';
+import {
+  getUserByValidSessionToken,
+  updateUserByUsername,
+} from '../../util/database';
 
-type UpdateProfileRequestBody = string;
+type UpdateProfileRequestBody = {
+  username: string;
+  firstName: string;
+  lastName: string;
+  age: string;
+  shortDescription: string;
+  isProvider: boolean;
+};
 
 type UpdateProfileResponseBody =
   | {
@@ -25,14 +35,20 @@ export default async function updateUserHandler(
   response: NextApiResponse<UpdateProfileResponseBody>,
 ) {
   if (request.method === 'PUT') {
-    const userUpdateRequest = JSON.parse(request.body);
+    const token = request.cookies.sessionToken;
+    // get user from session token
+    const user = await getUserByValidSessionToken(token);
+
+    if (!user) {
+      return;
+    }
     const updateUser = await updateUserByUsername(
-      userUpdateRequest.username,
-      userUpdateRequest.firstName,
-      userUpdateRequest.lastName,
-      userUpdateRequest.age,
-      userUpdateRequest.shortDescription,
-      userUpdateRequest.isProvider,
+      request.body.username,
+      request.body.firstName,
+      request.body.lastName,
+      request.body.age,
+      request.body.shortDescription,
+      request.body.isProvider,
     );
 
     response.status(200).json(updateUser);

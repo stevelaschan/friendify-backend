@@ -3,11 +3,15 @@ import {
   getRatingByUserId,
   getTimeslotsByProviderUsername,
   getUserById,
+  getUserByValidSessionToken,
   Rating,
   Timeslot,
 } from '../../util/database';
 
-type ProviderProfileRequestBody = string;
+type ProviderProfileRequestBody = {
+  id: number;
+  username: string;
+};
 
 type ProviderProfileResponseBody =
   | {
@@ -36,12 +40,18 @@ export default async function getRestrictedProfile(
   response: NextApiResponse<ProviderProfileResponseBody>,
 ) {
   if (request.method === 'POST') {
-    const userId = JSON.parse(request.body).id;
-    const username = JSON.parse(request.body).username;
+    const token = request.cookies.sessionToken;
+    // get user from session token
+    const user = await getUserByValidSessionToken(token);
 
-    const providerProfile = await getUserById(userId);
-    const providerTimeslots = await getTimeslotsByProviderUsername(username);
-    const ratings = await getRatingByUserId(userId);
+    if (!user) {
+      return;
+    }
+    const providerProfile = await getUserById(request.body.id);
+    const providerTimeslots = await getTimeslotsByProviderUsername(
+      request.body.username,
+    );
+    const ratings = await getRatingByUserId(request.body.id);
     const ratingArray = ratings.map((rating: Rating) => rating.rating);
     const averageRating =
       ratingArray.reduce((a: number, c: number) => a + c, 0) / ratings.length;

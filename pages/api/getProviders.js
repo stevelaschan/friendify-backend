@@ -1,7 +1,18 @@
-import { getAllRatings, getAllUsers } from '../../util/database';
+import {
+  getAllRatings,
+  getAllUsers,
+  getUserByValidSessionToken,
+} from '../../util/database';
 
 export default async function getProvidersHandler(request, response) {
   if (request.method === 'GET') {
+    const token = request.cookies.sessionToken;
+    // get user from session token
+    const validSessionUser = await getUserByValidSessionToken(token);
+
+    if (!validSessionUser) {
+      return;
+    }
     const providers = [];
     const users = await getAllUsers();
 

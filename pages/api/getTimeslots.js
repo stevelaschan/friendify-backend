@@ -1,9 +1,19 @@
-import { getTimeslotsByUsername } from '../../util/database';
+import {
+  getTimeslotsByUsername,
+  getUserByValidSessionToken,
+} from '../../util/database';
 
 export default async function getUserTimeslotsHandler(request, response) {
   if (request.method === 'POST') {
+    const token = request.cookies.sessionToken;
+    // get user from session token
+    const user = await getUserByValidSessionToken(token);
+
+    if (!user) {
+      return;
+    }
     const timeslotByUsername = await getTimeslotsByUsername(
-      JSON.parse(request.body).username,
+      request.body.username,
     );
 
     const newState = {};
